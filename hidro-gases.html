@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empuxo, Pascal & Gases — Aula Completa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4EEE0;
+  --surface:#FBF7EE;
+  --surface-2:#F1E9D7;
+  --ink:#221E18;
+  --muted:#6E6456;
+  --line:#E0D5BE;
+  --hydro:#1F6B73;     /* teal — água */
+  --hydro-soft:#D9EAE9;
+  --pascal:#B5552C;    /* rust — força */
+  --pascal-soft:#F2E0D4;
+  --gas:#B07D1E;       /* amber — gás/calor */
+  --gas-soft:#F2E7CE;
+  --danger:#A6402B;
+  --ok:#3E7A4F;
+  --shadow:0 1px 2px rgba(40,30,15,.05),0 8px 28px rgba(40,30,15,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Hanken Grotesk',system-ui,sans-serif;
+  font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;
+}
+
+/* progress bar */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--hydro),var(--pascal),var(--gas));z-index:200;transition:width .1s linear}
+
+/* top nav */
+header.bar{position:sticky;top:0;z-index:100;background:rgba(244,238,224,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:11px 24px;flex-wrap:wrap}
+.brand{font-family:'Fraunces',serif;font-weight:600;font-size:18px;letter-spacing:-.01em;margin-right:auto}
+.brand span{color:var(--hydro)}
+nav.spy{display:flex;gap:4px;flex-wrap:wrap}
+nav.spy a{font-size:13.5px;font-weight:600;color:var(--muted);text-decoration:none;padding:6px 11px;border-radius:99px;transition:.18s;letter-spacing:.01em}
+nav.spy a:hover{color:var(--ink);background:var(--surface-2)}
+nav.spy a.active{color:#fff;background:var(--ink)}
+
+/* hero */
+.hero{max-width:1080px;margin:0 auto;padding:64px 24px 30px}
+.kicker{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--pascal);margin-bottom:18px}
+.hero h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(38px,6.4vw,68px);line-height:1.02;letter-spacing:-.025em;margin:0 0 18px}
+.hero h1 em{font-style:italic;color:var(--hydro)}
+.hero p.lead{font-size:19px;color:var(--muted);max-width:660px;margin:0 0 26px}
+.meta-row{display:flex;gap:10px;flex-wrap:wrap}
+.chip{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
+.chip b{color:var(--ink);font-weight:600}
+
+/* layout */
+main{max-width:1080px;margin:0 auto;padding:24px}
+section.module{padding:54px 0 20px;border-top:1px solid var(--line);scroll-margin-top:80px}
+section.module:first-of-type{border-top:none}
+.mod-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.mod-num{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;padding:4px 10px;border-radius:7px;color:#fff}
+.m-hydro .mod-num{background:var(--hydro)} .m-pascal .mod-num{background:var(--pascal)} .m-gas .mod-num{background:var(--gas)}
+.mod-head h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(27px,4vw,38px);letter-spacing:-.02em;margin:0;line-height:1.08}
+.tag{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.05em;color:var(--muted);margin:2px 0 22px;padding-left:2px}
+
+h3{font-family:'Fraunces',serif;font-weight:600;font-size:23px;letter-spacing:-.01em;margin:38px 0 12px;line-height:1.2}
+h4{font-family:'Hanken Grotesk',sans-serif;font-weight:700;font-size:16px;letter-spacing:.01em;margin:24px 0 8px}
+p{margin:0 0 14px}
+strong{font-weight:700}
+.muted{color:var(--muted)}
+
+/* formula box */
+.formula{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin:18px 0;box-shadow:var(--shadow);text-align:center}
+.formula .eq{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--ink);letter-spacing:.01em}
+.formula .eq small{font-size:13px;color:var(--muted);font-weight:500}
+.formula .cap{font-size:13.5px;color:var(--muted);margin-top:8px}
+.var{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:14px;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:1px 7px;margin:1px 1px}
+
+/* callouts */
+.callout{border-radius:13px;padding:16px 20px;margin:20px 0;border:1px solid;font-size:15.5px}
+.callout .lbl{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:6px}
+.c-trap{background:#FBEDE7;border-color:#EBC9BC;color:#5e2a1c}.c-trap .lbl{color:var(--danger)}
+.c-key{background:var(--hydro-soft);border-color:#B9D6D4;color:#163e42}.c-key .lbl{color:var(--hydro)}
+.c-prova{background:var(--gas-soft);border-color:#E2CE9C;color:#5c441a}.c-prova .lbl{color:var(--gas)}
+.c-add{background:#F0EDE4;border-color:var(--line);color:#4a4338}.c-add .lbl{color:var(--muted)}
+.callout ul{margin:6px 0 0;padding-left:20px}.callout li{margin:4px 0}
+
+/* worked example */
+.solved{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--pascal);border-radius:12px;padding:20px 22px;margin:22px 0;box-shadow:var(--shadow)}
+.m-hydro .solved{border-left-color:var(--hydro)} .m-gas .solved{border-left-color:var(--gas)}
+.solved .src{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.solved h4{margin-top:0}
+.step{font-family:'JetBrains Mono',monospace;font-size:14.5px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:9px 13px;margin:8px 0;overflow-x:auto;white-space:nowrap}
+.answer{display:inline-block;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:15px;background:var(--ink);color:#fff;border-radius:8px;padding:7px 14px;margin-top:8px}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;margin:18px 0}
+table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--surface);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--surface-2)}
+td{vertical-align:top}
+tr:last-child td{border-bottom:none}
+td code,th code{font-family:'JetBrains Mono',monospace;font-size:13.5px}
+
+/* svg figure */
+figure{margin:24px 0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:var(--shadow)}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-size:13px;color:var(--muted);margin-top:12px;text-align:center;font-style:italic}
+
+/* video buttons */
+.videos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0}
+a.vid{display:flex;align-items:center;gap:12px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 15px;transition:.18s;box-shadow:var(--shadow)}
+a.vid:hover{transform:translateY(-2px);border-color:var(--pascal)}
+.vid .play{flex:0 0 38px;height:38px;border-radius:9px;background:#cc2b27;display:grid;place-items:center}
+.vid .play svg{width:16px;height:16px}
+.vid .txt{display:flex;flex-direction:column;line-height:1.25}
+.vid .vt{font-weight:700;font-size:14px;color:var(--ink)}
+.vid .vs{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-top:2px}
+
+/* back to top */
+#top{position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:50%;background:var(--ink);color:#fff;border:none;cursor:pointer;display:grid;place-items:center;opacity:0;pointer-events:none;transition:.25s;z-index:90;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+#top.show{opacity:1;pointer-events:auto}
+#top:hover{background:var(--hydro)}
+
+footer{max-width:1080px;margin:0 auto;padding:40px 24px 60px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+footer b{color:var(--ink)}
+
+@media(max-width:680px){
+  body{font-size:16px}
+  .hero{padding:42px 20px 20px}
+  nav.spy{display:none}
+  main{padding:16px}
+  .step{font-size:13px}
+}
+@media print{
+  #progress,header.bar,#top,.videos,nav.spy{display:none!important}
+  body{background:#fff;font-size:12pt}
+  section.module{break-inside:avoid;padding:24px 0}
+  figure,.solved,.formula,.callout,table{break-inside:avoid;box-shadow:none}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<header class="bar">
+  <div class="bar-inner">
+    <div class="brand">Hidro <span>+</span> Gases</div>
+    <nav class="spy">
+      <a href="#empuxo">Empuxo</a>
+      <a href="#pascal">Pascal</a>
+      <a href="#gases">Gases</a>
+      <a href="#sintese">Síntese</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="kicker">Física · 2º EM · Listas 05 · 06 · 07</div>
+  <h1>Empuxo, <em>Pascal</em><br>e o estudo dos gases</h1>
+  <p class="lead">Do zero ao avançado: por que um corpo flutua, como uma força pequena vira força gigante na prensa hidráulica, e o que governa um gás quando você mexe em pressão, volume e temperatura. Tudo amarrado nas suas listas — com as questões resolvidas passo a passo.</p>
+  <div class="meta-row">
+    <span class="chip">Empuxo · <b>Arquimedes</b></span>
+    <span class="chip">Princípio de <b>Pascal</b></span>
+    <span class="chip">Gases · <b>Clapeyron</b></span>
+    <span class="chip"><b>3</b> questões resolvidas</span>
+  </div>
+</div>
+
+<main>
+
+<!-- ===================== MÓDULO 1 — EMPUXO ===================== -->
+<section class="module m-hydro" id="empuxo">
+  <div class="mod-head"><span class="mod-num">01</span><h2>Empuxo & Princípio de Arquimedes</h2></div>
+  <div class="tag">Lista 07 — Teorema de Arquimedes</div>
+
+  <p>Quando você mergulha qualquer corpo num fluido (líquido ou gás), o fluido <strong>empurra esse corpo de baixo para cima</strong>. Essa força vertical, sempre para cima, é o <strong>empuxo</strong> (<span class="var">E</span>). É ela que explica por que um navio de ferro flutua, por que você se sente "mais leve" na piscina e por que um balão sobe.</p>
+
+  <h3>Por que o empuxo existe</h3>
+  <p>A pressão num fluido <strong>aumenta com a profundidade</strong> (Lei de Stevin). Então a face de baixo de um corpo submerso está numa profundidade maior que a face de cima → recebe pressão maior → é empurrada para cima com mais força do que a face de cima é empurrada para baixo. Essa diferença, somada em toda a superfície, resulta numa força líquida para cima: o empuxo.</p>
+
+  <div class="callout c-key">
+    <span class="lbl">Ideia central de Arquimedes</span>
+    O empuxo é igual ao <strong>peso do fluido deslocado</strong> pelo corpo. "Deslocar" fluido significa ocupar o lugar dele — o volume de fluido que sai é exatamente o <strong>volume imerso</strong> do corpo.
+  </div>
+
+  <h3>A fórmula que resolve tudo</h3>
+  <div class="formula">
+    <div class="eq">E = ρ<sub>fluido</sub> · V<sub>imerso</sub> · g</div>
+    <div class="cap">empuxo (N) = densidade do fluido × volume imerso × gravidade</div>
+  </div>
+  <p>Repare nas três peças e em <em>quem</em> é quem — é aqui que a maioria dos erros nasce:</p>
+  <ul>
+    <li><span class="var">ρ<sub>fluido</sub></span> → densidade do <strong>fluido</strong> (a água, o óleo, o mercúrio), <strong>nunca</strong> a do corpo.</li>
+    <li><span class="var">V<sub>imerso</sub></span> → só a <strong>parte submersa</strong> do corpo. Se o corpo está totalmente afundado, V<sub>imerso</sub> = V<sub>total</sub>. Se está boiando, é só o pedaço de baixo da linha d'água.</li>
+    <li><span class="var">g</span> → gravidade local (geralmente 10 m/s²).</li>
+  </ul>
+
+  <p class="muted" style="font-size:14px"><strong>Complemento para melhor compreensão:</strong> nas suas anotações aparece também a forma <code>E = m<sub>fluido deslocado</sub> · g</code>. É a mesma coisa: como <code>m = ρ·V</code>, substituir a massa do fluido deslocado por <code>ρ<sub>fluido</sub>·V<sub>imerso</sub></code> dá a fórmula acima. Pense assim: <strong>volume líquido deslocado = volume imerso</strong> (foi exatamente o que você anotou).</p>
+
+  <figure>
+    <svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Corpo flutuando com forças peso e empuxo">
+      <defs>
+        <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#bfe1df"/><stop offset="1" stop-color="#8fc4c1"/>
+        </linearGradient>
+      </defs>
+      <!-- tank -->
+      <rect x="60" y="70" width="320" height="190" rx="6" fill="url(#water)" stroke="#1F6B73" stroke-width="2"/>
+      <line x1="60" y1="120" x2="380" y2="120" stroke="#1F6B73" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="388" y="116" font-family="JetBrains Mono,monospace" font-size="12" fill="#1F6B73">linha d'água</text>
+      <!-- floating cube -->
+      <rect x="170" y="92" width="110" height="90" rx="4" fill="#E9DEC2" stroke="#7a6a3f" stroke-width="2"/>
+      <rect x="170" y="120" width="110" height="62" rx="0" fill="#caa84f" opacity=".55"/>
+      <text x="225" y="84" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a6a3f">corpo</text>
+      <text x="225" y="158" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#5c441a">V imerso</text>
+      <!-- weight arrow down -->
+      <line x1="225" y1="137" x2="225" y2="235" stroke="#A6402B" stroke-width="3"/>
+      <polygon points="225,245 219,231 231,231" fill="#A6402B"/>
+      <text x="234" y="225" font-family="JetBrains Mono,monospace" font-size="14" fill="#A6402B">P (peso)</text>
+      <!-- buoyancy arrow up -->
+      <line x1="225" y1="137" x2="225" y2="40" stroke="#1F6B73" stroke-width="3"/>
+      <polygon points="225,30 219,44 231,44" fill="#1F6B73"/>
+      <text x="234" y="48" font-family="JetBrains Mono,monospace" font-size="14" fill="#1F6B73">E (empuxo)</text>
+      <!-- equilibrium panel -->
+      <g transform="translate(470,90)">
+        <text x="0" y="0" font-family="Fraunces,serif" font-size="17" fill="#221E18">Equilíbrio na flutuação</text>
+        <rect x="0" y="14" width="210" height="44" rx="8" fill="#FBF7EE" stroke="#E0D5BE"/>
+        <text x="105" y="42" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="16" fill="#221E18" font-weight="600">E = P</text>
+        <text x="0" y="92" font-family="Hanken Grotesk,sans-serif" font-size="13" fill="#6E6456">ρ_fluido·V_imerso·g</text>
+        <text x="0" y="112" font-family="Hanken Grotesk,sans-serif" font-size="13" fill="#6E6456">= ρ_corpo·V_total·g</text>
+        <line x1="0" y1="126" x2="210" y2="126" stroke="#E0D5BE"/>
+        <text x="0" y="150" font-family="JetBrains Mono,monospace" font-size="14" fill="#1F6B73" font-weight="600">V_imerso / V_total = ρ_corpo / ρ_fluido</text>
+      </g>
+    </svg>
+    <figcaption>Corpo boiando: o empuxo (azul, para cima) equilibra o peso (vermelho, para baixo). A fração submersa revela a razão entre as densidades.</figcaption>
+  </figure>
+
+  <h3>Os três cenários — flutua, afunda ou para no meio?</h3>
+  <p>Compare empuxo máximo (corpo todo submerso) com o peso. Ou, de forma mais direta, compare densidades:</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Situação</th><th>Relação de forças</th><th>Densidades</th><th>O que acontece</th></tr>
+    <tr><td><strong>Afunda</strong></td><td>P &gt; E<sub>máx</sub></td><td>ρ<sub>corpo</sub> &gt; ρ<sub>fluido</sub></td><td>vai ao fundo</td></tr>
+    <tr><td><strong>Flutua boiando</strong></td><td>P = E (parcial)</td><td>ρ<sub>corpo</sub> &lt; ρ<sub>fluido</sub></td><td>parte fora, parte dentro</td></tr>
+    <tr><td><strong>Equilíbrio submerso</strong></td><td>P = E (total)</td><td>ρ<sub>corpo</sub> = ρ<sub>fluido</sub></td><td>parado, totalmente imerso</td></tr>
+  </table>
+  </div>
+
+  <div class="callout c-key">
+    <span class="lbl">O atalho que vale ouro na prova</span>
+    Para um corpo <strong>boiando em equilíbrio</strong>: <strong>fração submersa = ρ<sub>corpo</sub> ÷ ρ<sub>fluido</sub></strong>. Se um corpo boia com 60% do volume submerso na água, sua densidade é 0,60 g/cm³ — direto, sem montar forças.
+  </div>
+
+  <h3>Peso aparente</h3>
+  <p>Se você pendura um corpo num dinamômetro e mergulha no fluido, o aparelho marca menos que o peso real. Essa "leitura" é o <strong>peso aparente</strong>:</p>
+  <div class="formula">
+    <div class="eq">P<sub>aparente</sub> = P − E</div>
+    <div class="cap">o que o dinamômetro indica = peso real menos o empuxo</div>
+  </div>
+
+  <!-- WORKED EXAMPLE Q2 -->
+  <div class="solved">
+    <div class="src">Lista 07 · Questão 2 — VUNESP/FAMERP (modelo ENEM)</div>
+    <h4>A densidade da maçã que boia</h4>
+    <p style="font-size:15px">Coloca-se 400 mL de água num recipiente graduado. Ao pôr a maçã (que <strong>boia</strong>), o nível sobe para 520 mL. Afundando a maçã totalmente, o nível vai a 550 mL. Densidade da água = 1,0 g/mL. Qual a densidade da maçã?</p>
+
+    <h4 style="margin-top:14px">Leitura dos dados</h4>
+    <div class="step">V_imerso (boiando) = 520 − 400 = 120 mL  →  é o volume que estava submerso</div>
+    <div class="step">V_total (afundada) = 550 − 400 = 150 mL  →  é o volume real da maçã</div>
+
+    <h4>Montando o equilíbrio de flutuação (E = P)</h4>
+    <div class="step">ρ_água · V_imerso · g = ρ_maçã · V_total · g   (g cancela)</div>
+    <div class="step">ρ_maçã = ρ_água · (V_imerso / V_total) = 1,0 · (120/150)</div>
+    <div class="step">ρ_maçã = 120/150 = 4/5 = 0,8 g/mL</div>
+    <span class="answer">Resposta: c) 0,80 g/mL</span>
+    <p class="muted" style="font-size:13.5px;margin-top:12px">Veja como o atalho funciona: 120/150 = 80% submerso → densidade 0,8 da água. Mesmo raciocínio das suas anotações (μc = 12/15 = 0,8).</p>
+  </div>
+
+  <div class="callout c-trap">
+    <span class="lbl">Pegadinhas que mais derrubam</span>
+    <ul>
+      <li><strong>Trocar V<sub>imerso</sub> por V<sub>total</sub>:</strong> só são iguais se o corpo estiver totalmente submerso. Boiando, use só a parte de baixo.</li>
+      <li><strong>Usar a densidade do corpo na fórmula do empuxo:</strong> no empuxo entra a densidade do <em>fluido</em>. A do corpo só aparece quando você escreve o peso (P = ρ<sub>corpo</sub>·V<sub>total</sub>·g).</li>
+      <li><strong>Unidades:</strong> 1 g/cm³ = 1 g/mL = 1000 kg/m³. Misturar isso destrói a conta.</li>
+      <li><strong>"Volume da parte oca":</strong> em esferas ocas, o empuxo usa o volume <em>externo</em> (o que desloca água), mas a massa/peso usa só o material. São volumes diferentes.</li>
+    </ul>
+  </div>
+
+  <div class="callout c-prova">
+    <span class="lbl">O que mais cai</span>
+    Densidade por flutuação (fração submersa), peso aparente com dinamômetro, esfera oca (volume externo vs. material), corpo no fundo do recipiente (normal N = P − E), e o clássico "líquido transbordando pelo ladrão" (massa de líquido deslocado = empuxo/g).
+  </div>
+
+  <h4>Vídeos completos — verificados</h4>
+  <div class="videos">
+    <a class="vid" href="https://www.youtube.com/watch?v=n5_qJ2cIr9s" target="_blank" rel="noopener">
+      <span class="play"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      <span class="txt"><span class="vt">Empuxo — Teorema de Arquimedes</span><span class="vs">Prof. Boaro · Hidrostática Aula 4</span></span>
+    </a>
+    <a class="vid" href="https://www.youtube.com/watch?v=Wit0of_vubU" target="_blank" rel="noopener">
+      <span class="play"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      <span class="txt"><span class="vt">Empuxo — Resumo para o ENEM</span><span class="vs">Curió / Toda Matéria</span></span>
+    </a>
+    <a class="vid" href="https://www.youtube.com/watch?v=3mKZkiZ6OaM" target="_blank" rel="noopener">
+      <span class="play"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      <span class="txt"><span class="vt">Peso aparente — aplicação</span><span class="vs">Complemento sobre dinamômetro</span></span>
+    </a>
+  </div>
+</section>
+
+<!-- ===================== MÓDULO 2 — PASCAL ===================== -->
+<section class="module m-pascal" id="pascal">
+  <div class="mod-head"><span class="mod-num">02</span><h2>Princípio de Pascal & Prensa Hidráulica</h2></div>
+  <div class="tag">Lista 05 — Princípio de Pascal</div>
+
+  <p>Pascal descobriu uma propriedade simples e poderosa dos líquidos: <strong>qualquer variação de pressão aplicada num ponto de um líquido em equilíbrio é transmitida integralmente a todos os outros pontos</strong>. Sem perdas, sem atraso. É o coração da prensa hidráulica, do freio do carro e do elevador do posto de gasolina.</p>
+
+  <div class="callout c-key">
+    <span class="lbl">Por que isso é verdade</span>
+    O líquido é <strong>incompressível</strong> (volume praticamente constante). Então, ao apertar um ponto, ele não "engole" o aumento de pressão — repassa tudo. Se a pressão sobe ΔP num ponto, sobe o <em>mesmo</em> ΔP em todos os outros.
+  </div>
+
+  <h3>A prensa hidráulica: multiplicando força</h3>
+  <p>Dois êmbolos (pistões) ligados pelo mesmo líquido. Aperto o pequeno com força <span class="var">F<sub>A</sub></span>, ele cria uma pressão que se transmite ao êmbolo grande. Como a pressão é a mesma nos dois lados:</p>
+  <div class="formula">
+    <div class="eq">F<sub>A</sub> / A<sub>A</sub> = F<sub>B</sub> / A<sub>B</sub></div>
+    <div class="cap">mesma pressão dos dois lados (ΔP<sub>A</sub> = ΔP<sub>B</sub>)</div>
+  </div>
+  <p>Como a pressão é força ÷ área, basta a área do êmbolo B ser maior que a de A para que a força em B fique <strong>multiplicada</strong> na mesma proporção. Área 5× maior → força 5× maior.</p>
+
+  <figure>
+    <svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Prensa hidráulica com êmbolo pequeno e grande">
+      <!-- liquid U -->
+      <path d="M150 150 L150 250 Q150 280 180 280 L540 280 Q570 280 570 250 L570 120" fill="none" stroke="#B5552C" stroke-width="2"/>
+      <path d="M120 150 L120 260 Q120 300 170 300 L550 300 Q600 300 600 260 L600 120" fill="none" stroke="#B5552C" stroke-width="2"/>
+      <path d="M120 150 L150 150 L150 250 Q150 270 175 270 L545 270 Q570 270 570 250 L570 120 L600 120 L600 260 Q600 300 550 300 L170 300 Q120 300 120 260 Z" fill="#F2E0D4" opacity=".7"/>
+      <!-- small piston -->
+      <rect x="120" y="135" width="30" height="18" fill="#7a4a2c"/>
+      <line x1="135" y1="135" x2="135" y2="80" stroke="#A6402B" stroke-width="3"/>
+      <polygon points="135,72 129,86 141,86" fill="#A6402B"/>
+      <text x="100" y="66" font-family="JetBrains Mono,monospace" font-size="14" fill="#A6402B">F_A (pequena)</text>
+      <text x="100" y="172" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a4a2c">A_A</text>
+      <!-- big piston -->
+      <rect x="570" y="105" width="30" height="18" fill="#7a4a2c"/>
+      <line x1="585" y1="105" x2="585" y2="50" stroke="#1F6B73" stroke-width="6"/>
+      <polygon points="585,40 576,56 594,56" fill="#1F6B73"/>
+      <text x="525" y="34" font-family="JetBrains Mono,monospace" font-size="14" fill="#1F6B73">F_B (GRANDE)</text>
+      <text x="608" y="120" font-family="JetBrains Mono,monospace" font-size="12" fill="#7a4a2c">A_B</text>
+      <!-- center relation -->
+      <rect x="300" y="200" width="160" height="48" rx="9" fill="#FBF7EE" stroke="#E0D5BE"/>
+      <text x="380" y="230" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="15" fill="#221E18" font-weight="600">F_A/A_A = F_B/A_B</text>
+    </svg>
+    <figcaption>Força pequena num êmbolo pequeno gera a mesma pressão que uma força grande num êmbolo grande. A prensa "troca" força por deslocamento.</figcaption>
+  </figure>
+
+  <h3>O preço da multiplicação: conservação de volume e trabalho</h3>
+  <p>Nada é de graça. Quando o êmbolo pequeno desce muito, ele empurra um volume de líquido que faz o grande subir <strong>pouco</strong>. O volume que desce de um lado é igual ao que sobe do outro:</p>
+  <div class="formula">
+    <div class="eq">A<sub>A</sub> · d<sub>A</sub> = A<sub>B</sub> · d<sub>B</sub></div>
+    <div class="cap">conservação de volume (V<sub>cilíndrico</sub> = A · d, líquido incompressível)</div>
+  </div>
+  <p>E daí sai a <strong>conservação do trabalho</strong> — você ganha força mas perde deslocamento na mesma proporção, então a energia se conserva:</p>
+  <div class="formula">
+    <div class="eq">W<sub>A</sub> = W<sub>B</sub>  →  F<sub>A</sub> · d<sub>A</sub> = F<sub>B</sub> · d<sub>B</sub></div>
+    <div class="cap">o trabalho que entra é igual ao trabalho que sai</div>
+  </div>
+
+  <h3>Vantagem mecânica</h3>
+  <p>O número pelo qual a força é multiplicada:</p>
+  <div class="formula">
+    <div class="eq">V<sub>m</sub> = F<sub>maior</sub> / F<sub>menor</sub> = A<sub>maior</sub> / A<sub>menor</sub> = d<sub>menor</sub> / d<sub>maior</sub></div>
+    <div class="cap">ganho de força = razão das áreas = razão inversa dos deslocamentos</div>
+  </div>
+
+  <div class="callout c-add">
+    <span class="lbl">Complemento para melhor compreensão · áreas dos êmbolos</span>
+    Como suas anotações mostram, a área depende do formato do êmbolo:
+    <ul>
+      <li>Êmbolo <strong>circular</strong> (o caso normal): A = π·r² = π·D²/4</li>
+      <li>Diâmetro dobra → área quadruplica (depende de D²). Por isso "diâmetro 5×" não é força 5×, e sim força 25×.</li>
+    </ul>
+  </div>
+
+  <!-- WORKED EXAMPLE Q5 -->
+  <div class="solved">
+    <div class="src">Lista 05 · Questão 5 — Olimpíada Brasileira de Física (modelo ENEM)</div>
+    <h4>O deslocamento do êmbolo do freio</h4>
+    <p style="font-size:15px">Freio hidráulico: o pistão de comando tem área <strong>100 mm²</strong> e desloca <strong>2,0 cm</strong>. O êmbolo do freio tem área <strong>400 mm²</strong>. Qual o deslocamento do êmbolo do freio?</p>
+
+    <h4 style="margin-top:14px">Conservação de volume</h4>
+    <div class="step">A_A · d_A = A_B · d_B   →   100 · 2,0 = 400 · d_B</div>
+    <div class="step">200 = 400 · d_B   →   d_B = 200/400 = 0,5 cm</div>
+    <span class="answer">Resposta: c) 0,5 cm</span>
+    <p class="muted" style="font-size:13.5px;margin-top:12px">A regra de três que você anotou (10 → 1 ; 5 → x) é a mesma lógica de proporção. O êmbolo maior anda menos — coerente com a prensa.</p>
+  </div>
+
+  <div class="solved">
+    <div class="src">Lista 05 · Questão 1 (b) — prensa elevando furgão</div>
+    <h4>Deslocamento do êmbolo pequeno</h4>
+    <p style="font-size:15px">Furgão de 2,0 t (peso F<sub>2</sub> = 20000 N) precisa subir 1,0 m. A força no êmbolo pequeno é F<sub>1</sub> = 100 N. Quanto ele precisa descer?</p>
+    <div class="step">W_F1 = W_F2   →   F_1·d_1·cos0° = F_2·d_2·cos0°   (cos0° = 1)</div>
+    <div class="step">F_1·d_1 = F_2·d_2   →   100·d_1 = 20000·1</div>
+    <div class="step">d_1 = 20000/100 = 200 m</div>
+    <span class="answer">Resposta: d₁ = 200 m</span>
+    <p class="muted" style="font-size:13.5px;margin-top:12px">Para subir o furgão só 1 m com força 200× menor, o êmbolo pequeno precisa percorrer 200 m. O ganho de força custa deslocamento — energia conservada.</p>
+  </div>
+
+  <div class="callout c-trap">
+    <span class="lbl">Pegadinhas que mais derrubam</span>
+    <ul>
+      <li><strong>Confundir as fórmulas:</strong> força usa razão <em>direta</em> de áreas (F∝A); deslocamento usa razão <em>inversa</em> (d∝1/A). Troque e o resultado inverte.</li>
+      <li><strong>Diâmetro × área:</strong> se a questão dá diâmetro, lembre que A ∝ D² (não ∝ D). Esse é o erro nº 1 nas questões de seringa/agulha.</li>
+      <li><strong>Unidades de área:</strong> mm², cm², m² — como aparecem como razão (A_A/A_B), a unidade some, mas só se forem iguais nos dois. Padronize antes.</li>
+      <li><strong>Prensa não cria energia:</strong> se "ganhou" força, "perdeu" deslocamento. Quem pensa que ganha tudo de graça erra a parte (b).</li>
+    </ul>
+  </div>
+
+  <div class="callout c-prova">
+    <span class="lbl">O que mais cai</span>
+    Elevador/macaco hidráulico (achar a força ou o diâmetro do pistão maior), seringa-agulha (força ampliada), freio hidráulico (deslocamento), e sistemas com 3 pistões em equilíbrio (cada um com sua área, mesma pressão).
+  </div>
+
+  <h4>Vídeos completos — verificados</h4>
+  <div class="videos">
+    <a class="vid" href="https://www.youtube.com/watch?v=MgFKKbmkb3E" target="_blank" rel="noopener">
+      <span class="play"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      <span class="txt"><span class="vt">Prensa Hidráulica — Teorema de Pascal</span><span class="vs">Prof. Boaro · Hidrostática Aula 3</span></span>
+    </a>
+    <a class="vid" href="https://www.youtube.com/watch?v=S2fAQDdY270" target="_blank" rel="noopener">
+      <span class="play"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      <span class="txt"><span class="vt">Pascal — Exercícios resolvidos</span><span class="vs">Hidrostática Aula 10</span></span>
+    </a>
+  </div>
+</section>
+
+<!-- ===================== MÓDULO 3 — GASES ===================== -->
+<section class="module m-gas" id="gases">
+  <div class="mod-head"><span class="mod-num">03</span><h2>Estudo dos Gases</h2></div>
+  <div class="tag">Lista 06 — Gases Perfeitos · Transformações & Clapeyron</div>
+
+  <p>Um gás é descrito por três <strong>variáveis de estado</strong>: pressão (P), volume (V) e temperatura (T). Mexer em uma quase sempre mexe nas outras. O "gás perfeito" (ou ideal) é um modelo onde as moléculas só colidem, sem interações à distância — e ele obedece a leis limpas que caem muito em prova.</p>
+
+  <div class="callout c-key">
+    <span class="lbl">Regra inegociável</span>
+    <strong>Temperatura SEMPRE em Kelvin</strong> nas fórmulas de gás. Usar °C destrói qualquer conta (proporção com zero ou negativo não faz sentido físico). Converta antes de tudo.
+  </div>
+
+  <h3>Conversões de temperatura</h3>
+  <div class="formula">
+    <div class="eq">T<sub>K</sub> = θ<sub>°C</sub> + 273  <small>&nbsp;&nbsp;|&nbsp;&nbsp;</small>  θ<sub>°C</sub>/5 = (θ<sub>°F</sub> − 32)/9</div>
+    <div class="cap">Kelvin ↔ Celsius ↔ Fahrenheit</div>
+  </div>
+
+  <h3>As três transformações particulares</h3>
+  <p>Quando o número de mols é constante (gás fechado, sem vazamento), trava-se uma variável e estudam-se as outras duas:</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Transformação</th><th>O que fica constante</th><th>Lei</th><th>Nome clássico</th></tr>
+    <tr><td><strong>Isotérmica</strong></td><td>Temperatura (T)</td><td><code>P·V = P₀·V₀</code></td><td>Lei de Boyle</td></tr>
+    <tr><td><strong>Isobárica</strong></td><td>Pressão (P)</td><td><code>V/T = V₀/T₀</code></td><td>Charles / Gay-Lussac</td></tr>
+    <tr><td><strong>Isocórica</strong> <span class="muted">(=isovolumétrica =isométrica)</span></td><td>Volume (V)</td><td><code>P/T = P₀/T₀</code></td><td>Lei de Charles</td></tr>
+  </table>
+  </div>
+  <p class="muted" style="font-size:14px"><strong>Memória rápida:</strong> "iso" = igual. <em>Térmica</em> → T fixa; <em>bárica</em> → pressão fixa (de "bar"); <em>córica/volumétrica</em> → volume fixo. A variável que dá nome é a que <strong>não muda</strong>.</p>
+
+  <figure>
+    <svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagramas das transformações gasosas">
+      <!-- isotermica -->
+      <g transform="translate(20,20)">
+        <text x="95" y="0" text-anchor="middle" font-family="Fraunces,serif" font-size="15" fill="#B07D1E">Isotérmica</text>
+        <line x1="20" y1="30" x2="20" y2="170" stroke="#221E18" stroke-width="1.5"/>
+        <line x1="20" y1="170" x2="180" y2="170" stroke="#221E18" stroke-width="1.5"/>
+        <path d="M40 50 Q70 130 170 158" fill="none" stroke="#B07D1E" stroke-width="2.5"/>
+        <text x="8" y="40" font-family="JetBrains Mono,monospace" font-size="11" fill="#6E6456">P</text>
+        <text x="175" y="188" font-family="JetBrains Mono,monospace" font-size="11" fill="#6E6456">V</text>
+        <text x="95" y="205" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#6E6456">P·V = cte</text>
+      </g>
+      <!-- isobarica -->
+      <g transform="translate(265,20)">
+        <text x="95" y="0" text-anchor="middle" font-family="Fraunces,serif" font-size="15" fill="#B07D1E">Isobárica</text>
+        <line x1="20" y1="30" x2="20" y2="170" stroke="#221E18" stroke-width="1.5"/>
+        <line x1="20" y1="170" x2="180" y2="170" stroke="#221E18" stroke-width="1.5"/>
+        <line x1="20" y1="170" x2="165" y2="50" stroke="#B07D1E" stroke-width="2.5"/>
+        <text x="8" y="40" font-family="JetBrains Mono,monospace" font-size="11" fill="#6E6456">V</text>
+        <text x="175" y="188" font-family="JetBrains Mono,monospace" font-size="11" fill="#6E6456">T</text>
+        <text x="95" y="205" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#6E6456">V/T = cte</text>
+      </g>
+      <!-- isocorica -->
+      <g transform="translate(510,20)">
+        <text x="95" y="0" text-anchor="middle" font-family="Fraunces,serif" font-size="15" fill="#B07D1E">Isocórica</text>
+        <line x1="20" y1="30" x2="20" y2="170" stroke="#221E18" stroke-width="1.5"/>
+        <line x1="20" y1="170" x2="180" y2="170" stroke="#221E18" stroke-width="1.5"/>
+        <line x1="20" y1="170" x2="165" y2="50" stroke="#B07D1E" stroke-width="2.5"/>
+        <text x="8" y="40" font-family="JetBrains Mono,monospace" font-size="11" fill="#6E6456">P</text>
+        <text x="175" y="188" font-family="JetBrains Mono,monospace" font-size="11" fill="#6E6456">T</text>
+        <text x="95" y="205" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#6E6456">P/T = cte</text>
+      </g>
+    </svg>
+    <figcaption>Isotérmica é hipérbole no diagrama P×V; isobárica e isocórica são retas que passam pela origem nos diagramas V×T e P×T.</figcaption>
+  </figure>
+
+  <h3>Lei geral dos gases (n constante)</h3>
+  <p>Quando <strong>não injeta nem vaza gás</strong>, o número de mols n é fixo. Aí as três variáveis se relacionam de uma vez só:</p>
+  <div class="formula">
+    <div class="eq">(P·V) / T = (P₀·V₀) / T₀ = constante</div>
+    <div class="cap">junta isotérmica + isobárica + isocórica num único atalho</div>
+  </div>
+
+  <h3>Equação de Clapeyron — o gás "por dentro"</h3>
+  <p>É a equação que conecta o estado macroscópico (P, V, T) à <strong>quantidade de gás</strong> (n mols):</p>
+  <div class="formula">
+    <div class="eq">P · V = n · R · T</div>
+    <div class="cap">R = 0,082 atm·L/(mol·K) &nbsp;ou&nbsp; 8,31 J/(mol·K)</div>
+  </div>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Símbolo</th><th>Significado</th><th>Detalhe</th></tr>
+    <tr><td><code>n</code></td><td>número de <strong>mols</strong></td><td>n = m / MM (massa real ÷ massa molar da tabela periódica)</td></tr>
+    <tr><td><code>N</code></td><td>número de <strong>moléculas</strong></td><td>N = n · 6,0×10²³ (constante de Avogadro)</td></tr>
+    <tr><td><code>R</code></td><td>constante dos gases</td><td>escolha R conforme as unidades de P e V</td></tr>
+    <tr><td><code>T</code></td><td>temperatura absoluta</td><td>sempre em Kelvin</td></tr>
+  </table>
+  </div>
+
+  <div class="callout c-key">
+    <span class="lbl">A decisão que define a questão</span>
+    <strong>Vazou ou injetou gás? → use Clapeyron (P·V = n·R·T)</strong> em cada estado, porque n muda.<br>
+    <strong>Gás fechado (n fixo)? → use a lei geral (P·V/T = cte).</strong><br>
+    Saber qual usar é metade da questão.
+  </div>
+
+  <!-- WORKED EXAMPLE Q5 compressao -->
+  <div class="solved">
+    <div class="src">Lista 06 · Questão 5 — compressão (n constante)</div>
+    <h4>Achar a temperatura final na compressão</h4>
+    <p style="font-size:15px">Estado A: P<sub>A</sub> = 4 atm, V<sub>A</sub> = 8 L, T<sub>A</sub> = 7 °C. Estado B: P<sub>B</sub> = 10 atm, V<sub>B</sub> = 6 L, T<sub>B</sub> = ? Gás fechado.</p>
+
+    <h4 style="margin-top:14px">1) Converter a temperatura</h4>
+    <div class="step">T_A = 7 + 273 = 280 K</div>
+
+    <h4>2) Lei geral (n fixo)</h4>
+    <div class="step">P_A·V_A / T_A = P_B·V_B / T_B   →   (4·8)/280 = (10·6)/T_B</div>
+    <div class="step">32/280 = 60/T_B   →   T_B = 60·280/32</div>
+    <div class="step">T_B = 16800/32 = 525 K</div>
+    <span class="answer">Resposta: T_B = 525 K</span>
+    <p class="muted" style="font-size:13.5px;margin-top:12px">Comprimiu (V caiu de 8→6 L) e aumentou pressão (4→10 atm) — coerente a temperatura subir bastante.</p>
+  </div>
+
+  <!-- WORKED EXAMPLE Q2 vazamento -->
+  <div class="solved">
+    <div class="src">Lista 06 · Questão 2 — vazamento de gás (n muda)</div>
+    <h4>Temperatura após o vazamento</h4>
+    <p style="font-size:15px">Mesma pressão e mesmo volume nos dois estados. Estado A: n<sub>A</sub> = n₀, T<sub>A</sub> = 27 °C. Estado B (após vazar): n<sub>B</sub> = 5n₀/6, T<sub>B</sub> = ?</p>
+
+    <h4 style="margin-top:14px">1) Como vazou gás, usa-se Clapeyron em cada estado</h4>
+    <div class="step">T_A = 27 + 273 = 300 K</div>
+    <div class="step">P·V = n_A·R·T_A   e   P·V = n_B·R·T_B   (P, V iguais)</div>
+
+    <h4>2) Igualar (P·V é o mesmo dos dois lados)</h4>
+    <div class="step">n_A · T_A = n_B · T_B   →   n₀·300 = (5n₀/6)·T_B</div>
+    <div class="step">300 = (5/6)·T_B   →   T_B = 300·6/5</div>
+    <div class="step">T_B = 1800/5 = 360 K</div>
+    <span class="answer">Resposta: T_B = 360 K  (= 87 °C)</span>
+    <p class="muted" style="font-size:13.5px;margin-top:12px">Saiu gás (n caiu para 5/6) mas P e V se mantiveram — para compensar, a temperatura teve que subir. Exatamente o raciocínio anotado: "se P e V constantes, n·T é constante".</p>
+  </div>
+
+  <div class="callout c-trap">
+    <span class="lbl">Pegadinhas que mais derrubam</span>
+    <ul>
+      <li><strong>Esquecer o Kelvin:</strong> o erro mais comum de todos. 27 °C não é 27 na fórmula, é 300.</li>
+      <li><strong>Usar lei geral quando vazou gás:</strong> se n muda, P·V/T NÃO é constante. Volte para Clapeyron.</li>
+      <li><strong>Misturar R com unidades erradas:</strong> P em atm e V em litros pede R = 0,082; P em Pa e V em m³ pede R = 8,31. Não misture.</li>
+      <li><strong>Confundir N (moléculas) com n (mols):</strong> diferem pelo fator 6×10²³.</li>
+    </ul>
+  </div>
+
+  <div class="callout c-prova">
+    <span class="lbl">O que mais cai</span>
+    Lei geral em compressão/expansão (achar T, P ou V), Clapeyron para massa de gás (n = m/MM), vazamento/injeção (n variável), identificação de transformação por gráfico (P×V, V×T, P×T) e airbag/aerossol no ENEM (Clapeyron com mols de reação).
+  </div>
+
+  <h4>Vídeos completos — verificados</h4>
+  <div class="videos">
+    <a class="vid" href="https://www.youtube.com/watch?v=XQ1EJDTNKpI" target="_blank" rel="noopener">
+      <span class="play"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      <span class="txt"><span class="vt">Transformações gasosas & Equação geral</span><span class="vs">Prof. Boaro · Termologia Aula 12</span></span>
+    </a>
+    <a class="vid" href="https://www.youtube.com/watch?v=PhkCpN5LoK4" target="_blank" rel="noopener">
+      <span class="play"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      <span class="txt"><span class="vt">Gases ideais — Equação de Clapeyron</span><span class="vs">Complemento focado em PV=nRT</span></span>
+    </a>
+  </div>
+</section>
+
+<!-- ===================== SÍNTESE ===================== -->
+<section class="module" id="sintese" style="border-top-color:var(--ink)">
+  <div class="mod-head"><span class="mod-num" style="background:var(--ink)">∑</span><h2>Síntese — o mapa de decisão</h2></div>
+  <div class="tag">Revisão final · use 2 minutos antes da prova</div>
+
+  <h3>Empuxo</h3>
+  <p>Força para cima = peso do fluido deslocado: <span class="var">E = ρ<sub>fluido</sub>·V<sub>imerso</sub>·g</span>. Boia em equilíbrio → <strong>E = P</strong> → fração submersa = ρ<sub>corpo</sub>/ρ<sub>fluido</sub>. Peso aparente = P − E. <strong>Cuidado:</strong> densidade do fluido (não do corpo) e volume imerso (não total).</p>
+
+  <h3>Pascal</h3>
+  <p>Pressão se transmite igual a todo o líquido. Prensa: <span class="var">F<sub>A</sub>/A<sub>A</sub> = F<sub>B</sub>/A<sub>B</sub></span>. Volume conserva: <span class="var">A<sub>A</sub>·d<sub>A</sub> = A<sub>B</sub>·d<sub>B</sub></span>. Ganha força → perde deslocamento (trabalho conserva). Diâmetro entra ao quadrado.</p>
+
+  <h3>Gases</h3>
+  <p>T sempre em Kelvin. Gás fechado → <span class="var">P·V/T = cte</span>. Vazou/injetou → <span class="var">P·V = n·R·T</span> em cada estado. Isotérmica (PV=cte), isobárica (V/T=cte), isocórica (P/T=cte).</p>
+
+  <div class="callout c-key">
+    <span class="lbl">A pergunta de ouro em cada tópico</span>
+    <ul>
+      <li><strong>Empuxo:</strong> o corpo está boiando ou totalmente submerso? (define V<sub>imerso</sub>)</li>
+      <li><strong>Pascal:</strong> a questão quer força ou deslocamento? (define qual razão usar)</li>
+      <li><strong>Gases:</strong> o número de mols mudou? (define lei geral × Clapeyron)</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p><b>Aula gerada a partir das suas anotações</b> (Listas 05, 06 e 07) e dos gabaritos correspondentes. Conteúdo principal extraído do material; complementos sinalizados quando adicionados para clareza.</p>
+  <p style="margin-top:8px">Vídeos confirmados como públicos e disponíveis no momento da geração. Se algum link cair, procure pelo título do vídeo e professor indicados.</p>
+</footer>
+
+<button id="top" aria-label="Voltar ao topo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg></button>
+
+<script>
+// progress bar
+const pb=document.getElementById('progress');
+const top=document.getElementById('top');
+function onScroll(){
+  const h=document.documentElement;
+  const sc=h.scrollTop||document.body.scrollTop;
+  const max=(h.scrollHeight-h.clientHeight)||1;
+  pb.style.width=(sc/max*100)+'%';
+  top.classList.toggle('show',sc>520);
+}
+document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+top.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+// scrollspy
+const links=[...document.querySelectorAll('nav.spy a')];
+const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+const io=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const id='#'+e.target.id;
+      links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')===id));
+    }
+  });
+},{rootMargin:'-45% 0px -50% 0px'});
+secs.forEach(s=>s&&io.observe(s));
+</script>
+</body>
+</html>
